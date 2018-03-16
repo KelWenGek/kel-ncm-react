@@ -2,8 +2,7 @@ import React from 'react';
 import { Route, Switch } from 'react-router';
 import ConnectedRouter from './ConnectedRouter';
 import { createBrowserHistory as createHistory } from "history";
-import Home from '@/components/Home';
-import Playlist from '@/components/Playlist';
+import Bundle from './Bundle'
 export const history = createHistory();
 
 export const renderRoutes = (routes, extraProps = {}, switchProps = {}) =>
@@ -16,7 +15,11 @@ export const renderRoutes = (routes, extraProps = {}, switchProps = {}) =>
                     exact={route.exact}
                     strict={route.strict}
                     render={props => (
-                        <route.component {...props} {...extraProps} route={route} />
+                        <Bundle load={route.component}>
+                            {
+                                Mod => <Mod {...props} {...extraProps} route={route} />
+                            }
+                        </Bundle>
                     )}
                 />
             ))}
@@ -28,12 +31,12 @@ export const routes = [
         name: 'home',
         path: '/',
         exact: true,
-        component: Home
+        component: () => import('@/components/Home')
     },
     {
         name: 'playlist',
         path: '/m/playlist/:id',
-        component: Playlist
+        component: () => import('@/components/Playlist')
     }
 ];
 

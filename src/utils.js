@@ -5,3 +5,5 @@ export function pad(val, str, len) {
     while (val.length < len) val = str + val;
     return val;
 }
+
+
