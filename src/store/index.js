@@ -25,7 +25,7 @@ export default createReducer(
                 loaded: false,
                 data: []
             },
-            Playlist: {},
+            Playlist: null,
             SearchKeyword: '',
             SearchSuggest: [],
             SearchResult: [],

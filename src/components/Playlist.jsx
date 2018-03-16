@@ -2,10 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import cn from 'classnames';
 import PlaylistARMap from '@/store/playlist';
-import { GET_PLAYLIST_DETAIL } from '@/constants/API';
+import { GET_PLAYLIST_DETAIL, GET_PLAYLIST_COMMENT } from '@/constants/API';
+import PlaylistComment from './PlaylistComment';
 export default connect(
     ({ app: { Playlist, PlaylistLoading } }) => ({ Playlist, PlaylistLoading }),
-    { onPlaylistAsync: PlaylistARMap.actionCreators.onAsync }
+    {
+        onPlaylistAsync: PlaylistARMap.actionCreators.onAsync,
+        onPlaylistCommentAsync: PlaylistARMap.actionCreators.onAsyncComment
+    }
 )(
     class Playlist extends Component {
 
@@ -29,34 +33,35 @@ export default connect(
 
 
         render() {
-            let creator, tracks, data;
+            let creator, tracks;
             let { Playlist, PlaylistLoading } = this.props;
             let { isExpanded } = this.state;
-            if (Playlist.data) {
-                data = Playlist.data;
-                ({ creator, tracks } = data);
+            if (Playlist) {
+                ({ creator, tracks } = Playlist);
             }
 
             return (
                 PlaylistLoading
                     ? <span className="u-spin"></span>
-                    : data
+                    : Playlist
                         ? <div className="m-playlist u-paddlr u-paddbm">
                             <section className="u-plhead pylst_header">
-                                <div className="plhead_bg" style={{ backgroundImage: `url("${data.coverImgUrl}")` }}>
+                                <div className="plhead_bg" style={{ backgroundImage: `url("${Playlist.coverImgUrl}")` }}>
                                 </div>
                                 <div className="plhead_wrap">
                                     <div className="plhead_fl lsthd_fl">
-                                        <img className="u-img" src={data.coverImgUrl} />
+                                        <img className="u-img" src={Playlist.coverImgUrl} />
                                         <span className="lsthd_icon">歌单</span>
                                         <i className="u-earp lsthd_num">
                                             {
-                                                `${(data.playCount / Math.pow(10, 4)).toFixed(1)}万`
+                                                `${(Playlist.playCount / Math.pow(10, 4)).toFixed(1)}万`
                                             }
                                         </i>
                                     </div>
                                     <div className="plhead_fr">
-                                        <h2 className="f-thide2 f-brk lsthd_title">{data.name}</h2>
+                                        <h2 className="f-thide2 f-brk lsthd_title">
+                                            {Playlist.name}
+                                        </h2>
                                         <div className="lsthd_auth f-thide">
                                             <a className="lsthd_link" href={`/m/user/${creator.userId}`}>
                                                 <div className="u-avatar lsthd_ava">
@@ -71,7 +76,7 @@ export default connect(
                                 <div className="lstit_tags">
                                     标签：
                                     {
-                                        data.tags.map((tag, index) => {
+                                        Playlist.tags.map((tag, index) => {
                                             return <em key={index} className="f-bd f-bd-full lstit_tag">{tag}</em>
                                         })
                                     }
@@ -80,7 +85,7 @@ export default connect(
                                 <div className="u-intro" onClick={this.handleExpand}>
                                     <div className={cn('f-brk', { 'f-thide3': !isExpanded })}>
                                         {
-                                            data.description.split('\n\n').map((desc, index) => {
+                                            Playlist.description.split('\n\n').map((desc, index) => {
                                                 let elem = [];
                                                 elem.push(<span key={`${index}-1`}>
                                                     <i>

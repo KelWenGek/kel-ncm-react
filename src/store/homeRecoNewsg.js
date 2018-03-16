@@ -6,7 +6,21 @@ const actionReducerMap = completeReducer(
         return {
             actionCreators: {
                 onAsync: options => async dispatch => {
-                    fetch({ options, dispatch, actionCreators });
+                    return fetch({
+                        options, dispatch, actionCreators
+                    }).then(({ data }) => {
+                        if (data.code === 200) {
+                            dispatch(actionCreators.onSuccess({
+                                loaded: true,
+                                data: data.result
+                            }));
+                        } else {
+                            let err = {
+                                message: '获取最新歌曲失败'
+                            };
+                            dispatch(actionCreators.onFailure(err));
+                        }
+                    });
                 }
             }
         }
