@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import EmptyComp from '@/components/Empty'
 
 export default connect(
-    ({ HomeRecoPlaylist, HomeRecoPlaylistLoading }) => ({ HomeRecoPlaylist, HomeRecoPlaylistLoading })
+    ({ app: { HomeRecoPlaylist, HomeRecoPlaylistLoading } }) => ({ HomeRecoPlaylist, HomeRecoPlaylistLoading })
 )(
     class HomeRecoPlaylistComp extends Component {
         render() {

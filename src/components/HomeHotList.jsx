@@ -6,7 +6,7 @@ import { GET_HOME_TOP } from '@/constants/API';
 import Empty from '@/components/Empty'
 import HomeHotListARMap from '@/store/homeHotList'
 export default connect(
-    ({ HomeHotListLoading, HomeHotList }) => ({ HomeHotListLoading, HomeHotList }),
+    ({ app: { HomeHotListLoading, HomeHotList } }) => ({ HomeHotListLoading, HomeHotList }),
     { onHotListAsync: HomeHotListARMap.actionCreators.onAsync }
 )(class HomeHotList extends Component {
 

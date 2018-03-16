@@ -7,7 +7,7 @@ import HomeRecoNewsgARMap from '@/store/homeRecoNewsg'
 import HomeRecoPlaylistComp from '@/components/HomeRecoPlaylist'
 import HomeRecoPlaylistARMap from '@/store/homeRecoPlaylist'
 export default connect(
-    ({ HomeRecoNewsg, HomeRecoPlaylist }) => ({ HomeRecoNewsg, HomeRecoPlaylist }),
+    ({ app: { HomeRecoNewsg, HomeRecoPlaylist } }) => ({ HomeRecoNewsg, HomeRecoPlaylist }),
     {
         onNewsgAsync: HomeRecoNewsgARMap.actionCreators.onAsync,
         onPlaylistAsync: HomeRecoPlaylistARMap.actionCreators.onAsync

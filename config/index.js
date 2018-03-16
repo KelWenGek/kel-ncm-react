@@ -69,7 +69,7 @@ module.exports = {
   dll: {
     entry: {
       'react': ['react', 'react-dom'],
-      'utility': ['redux', 'react-redux', 'redux-thunk', 'classnames', 'axios', 'react-router-dom']
+      'utility': ['redux', 'react-redux', 'redux-thunk', 'classnames', 'axios', 'react-router', 'react-router-redux']
     }
   }
 }

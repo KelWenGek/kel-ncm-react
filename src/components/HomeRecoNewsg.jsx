@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import EmptyComp from '@/components/Empty'
 export default connect(
-    ({ HomeRecoNewsg, HomeRecoNewsgLoading }) => ({ HomeRecoNewsg, HomeRecoNewsgLoading })
+    ({ app: { HomeRecoNewsg, HomeRecoNewsgLoading } }) => ({ HomeRecoNewsg, HomeRecoNewsgLoading })
 )(
     class HomeRecoNewsgComp extends Component {
         render() {

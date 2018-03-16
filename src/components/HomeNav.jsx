@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import HomeTabCurIdxARMap from '@/store/homeTabCurIdx';
 import cn from 'classnames'
 export default connect(
-    ({ HomeTabCurIdx }) => ({ HomeTabCurIdx }),
+    ({ app: { HomeTabCurIdx } }) => ({ HomeTabCurIdx }),
     { onTabChange: HomeTabCurIdxARMap.actionCreators.onChange }
 )(
     class HomeNav extends Component {

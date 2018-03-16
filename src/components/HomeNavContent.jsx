@@ -6,7 +6,7 @@ import HomeHotListComp from '@/components/HomeHotList'
 // import SearchComp from '@/components/Search'
 
 export default connect(
-    ({ HomeTabCurIdx }) => ({ HomeTabCurIdx })
+    ({ app: { HomeTabCurIdx } }) => ({ HomeTabCurIdx })
 )(
     class HomeNavContentComp extends Component {
 

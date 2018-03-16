@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { routerMiddleware, routerReducer } from 'react-router-redux';
 import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import rootReducer from '@/store/';
-import createRouter from '@/router/';
+import createRouter, { history } from '@/router/';
 const Router = createRouter();
-const store = createStore(rootReducer, applyMiddleware(thunk));
+const store = createStore(combineReducers({
+    app: rootReducer,
+    router: routerReducer
+}), applyMiddleware(routerMiddleware(history), thunk));
 
 export default class App extends Component {
     render() {
