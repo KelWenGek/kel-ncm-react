@@ -5,7 +5,6 @@ export function fetch(context) {
     let { options, dispatch, actionCreators } = context;
     dispatch(actionCreators.onLoading());
     return axios(options).catch(err => {
-        reject(err);
         dispatch(actionCreators.onFailure(err))
     });
 }

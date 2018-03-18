@@ -37,7 +37,12 @@ export const routes = [
         name: 'playlist',
         path: '/m/playlist/:id',
         component: () => import('@/components/Playlist')
-    }
+    },
+    {
+        name: 'song',
+        path: '/m/song/:id',
+        component: () => import('@/components/SongDetail')
+    },
 ];
 
 export default function createRouter() {

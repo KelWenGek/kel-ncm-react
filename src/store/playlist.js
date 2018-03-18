@@ -22,7 +22,7 @@ const actionReducerMap = completeReducer(
                             };
                             dispatch(actionCreators.onFailure(err));
                         }
-                    });;
+                    });
                 },
                 onAsyncComment: options => async (dispatch, getState) => {
                     return fetch({

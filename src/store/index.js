@@ -9,8 +9,10 @@ import playlist from './playlist';
 import searchHot from './searchHot';
 import searchInput from './searchInput';
 import searchResult from './searchResult';
-import searchSuggest from './searchSuggest'
-
+import searchSuggest from './searchSuggest';
+import songInfo from './songInfo';
+import songPlay from './songPlay';
+import songLyric from './songLyric';
 
 
 export default createReducer(
@@ -33,7 +35,21 @@ export default createReducer(
             SearchKeyword: '',
             SearchSuggest: null,
             SearchResult: null,
-            SearchHot: null
+            SearchHot: null,
+            LyricIndex: 0,
+            Song: {
+                loaded: false,
+                data: null
+            },
+            SongLyric: {
+                loaded: false,
+                data: null
+            },
+            SongPlay: {
+                loaded: false,
+                data: null
+            }
+
         },
         ['HomeTabCurIdx', 'SearchKeyword']
     ),
@@ -46,7 +62,10 @@ export default createReducer(
         searchHot,
         searchInput,
         searchResult,
-        searchSuggest
+        searchSuggest,
+        songInfo,
+        songPlay,
+        songLyric
     ])
 );
 
