@@ -16,24 +16,23 @@ export default connect(
                     {
                         !Playlist.cmt
                             ? <span className="u-spin"></span>
-                            : [
-                                <PlaylistCommentItem key={hotComments[0].commentId} title={'精彩评论'} comments={hotComments} />,
+                            :
+                            <div>
+                                <PlaylistCommentItem key={hotComments[0].commentId} title={'精彩评论'} comments={hotComments} />
                                 <PlaylistCommentItem key={comments[0].commentId} title={`最新评论(${total})`} comments={comments} />
-                            ]
-
-
-                    }
-                    {/* {
-                        more
-                            ? <div className="cmt_more f-bd f-bd-top">
-                                <span className="box">
-                                    {`查看全部${total}条评论`}
-                                    <i></i>
-                                </span>
+                                {
+                                    more
+                                        ?
+                                        <div className="cmt_more f-bd f-bd-top">
+                                            <span className="box">
+                                                {`查看全部${total}条评论`}
+                                                <i></i>
+                                            </span>
+                                        </div>
+                                        : ''
+                                }
                             </div>
-                            : ''
-                    } */}
-
+                    }
                 </div>
 
             )

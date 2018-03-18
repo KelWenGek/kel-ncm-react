@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import EmptyComp from '@/components/Empty'
 import HomeRecoComp from '@/components/HomeReco'
 import HomeHotListComp from '@/components/HomeHotList'
-// import SearchComp from '@/components/Search'
+import SearchComp from '@/components/Search'
 
 export default connect(
     ({ app: { HomeTabCurIdx } }) => ({ HomeTabCurIdx })
@@ -15,7 +15,7 @@ export default connect(
             switch (HomeTabCurIdx) {
                 case 0: Content = HomeRecoComp; break;
                 case 1: Content = HomeHotListComp; break;
-                case 2: Content = HomeRecoComp; break;
+                case 2: Content = SearchComp; break;
                 default: Content = EmptyComp;
             }
             return (

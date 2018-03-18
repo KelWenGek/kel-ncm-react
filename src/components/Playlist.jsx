@@ -24,14 +24,18 @@ export default connect(
             })
         }
         componentDidMount() {
-            let { match: { params }, onPlaylistAsync } = this.props;
+            let { match: { params }, onPlaylistAsync, onPlaylistCommentAsync } = this.props;
             onPlaylistAsync({
                 url: GET_PLAYLIST_DETAIL,
                 params
-            })
+            }).then((result) => {
+                document.title = result.name;
+                onPlaylistCommentAsync({
+                    url: GET_PLAYLIST_COMMENT,
+                    params
+                })
+            });
         }
-
-
         render() {
             let creator, tracks;
             let { Playlist, PlaylistLoading } = this.props;
@@ -111,7 +115,8 @@ export default connect(
                                 <ol className="u-songs">
                                     {
                                         tracks.map((item, index) => (
-                                            <li className={cn('u-song', { 'z-dis': item.copyright != 0 })} key={item.id} >
+                                            // , { 'z-dis': item.copyright != 0 }
+                                            <li className={cn('u-song')} key={item.id} >
                                                 <div className="sgi_fl">{index + 1}</div>
                                                 <div className="sgi_fr f-bd f-bd-btm">
                                                     <div className="sgich_fl">
@@ -131,7 +136,7 @@ export default connect(
                                     }
                                 </ol>
                             </div>
-                            {/* <PlaylistComment /> */}
+                            <PlaylistComment />
                         </div >
                         : null
             )

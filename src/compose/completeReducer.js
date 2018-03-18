@@ -4,7 +4,7 @@ function completeReducer(factory, options = {}) {
         options = factory;
         factory = null;
     }
-    if (typeof factory !== 'function') {
+    if (factory && typeof factory !== 'function') {
         throw new Error('the argument factory should be a function or an object option');
     }
     let reducerHandlers = {}, actionCreators = {}, actions;

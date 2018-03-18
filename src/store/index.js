@@ -6,6 +6,10 @@ import homeHotList from './homeHotList';
 import homeRecoNewsg from './homeRecoNewsg';
 import homeRecoPlaylist from './homeRecoPlaylist';
 import playlist from './playlist';
+import searchHot from './searchHot';
+import searchInput from './searchInput';
+import searchResult from './searchResult';
+import searchSuggest from './searchSuggest'
 
 
 
@@ -27,9 +31,9 @@ export default createReducer(
             },
             Playlist: null,
             SearchKeyword: '',
-            SearchSuggest: [],
-            SearchResult: [],
-            SearchHot: []
+            SearchSuggest: null,
+            SearchResult: null,
+            SearchHot: null
         },
         ['HomeTabCurIdx', 'SearchKeyword']
     ),
@@ -38,7 +42,11 @@ export default createReducer(
         homeHotList,
         homeRecoNewsg,
         homeRecoPlaylist,
-        playlist
+        playlist,
+        searchHot,
+        searchInput,
+        searchResult,
+        searchSuggest
     ])
 );
 

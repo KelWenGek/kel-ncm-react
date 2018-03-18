@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import cn from 'classnames';
-import { pad } from '@/utils';
+import { pad } from '@/shared/util';
 import { GET_HOME_TOP } from '@/constants/API';
 import Empty from '@/components/Empty'
 import HomeHotListARMap from '@/store/homeHotList'
