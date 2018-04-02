@@ -30,7 +30,7 @@ const actionReducerMap = completeReducer(
                     }
                 },
                 onAsync: options => async (dispatch, getState) => {
-                    await fetch({
+                    return fetch({
                         options, dispatch, actionCreators
                     }).then(({ data }) => {
                         if (data.code === 200) {
@@ -42,7 +42,6 @@ const actionReducerMap = completeReducer(
                                     }
                                 )
                             );
-
                         } else {
                             let err = {
                                 message: '获取歌词信息失败'
@@ -50,7 +49,6 @@ const actionReducerMap = completeReducer(
                             dispatch(actionCreators.onFailure(err));
                         }
                     });
-                    await dispatch(SongPlayARMap.actionCreators.onPlayingSet(true))
                 }
             }
         }

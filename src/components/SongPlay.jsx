@@ -19,30 +19,35 @@ export default connect(
             parent: PropTypes.object
         }
         createAudio() {
-            let { SongPlay, onSetPlayingStatus } = this.props,
+            let { SongPlay, onSetPlayingStatus, onResetLyricTimer, onSetTransformStyle } = this.props,
+                self = this,
                 autoPlay = SongPlay.data.playing,
                 src = SongPlay.data.url,
-                audio = this.el = new Audio(src),
-                refs = this.context.parent,
-                infoWrapper = refs.infoComp.getWrappedInstance(),
-                lycWrapper = refs.lyricComp.getWrappedInstance();
+                audio = this.el = new Audio(src);
+            // refs = this.context.parent,
+            // infoWrapper = refs.infoComp.getWrappedInstance(),
+            // lycWrapper = refs.lyricComp.getWrappedInstance();
             //音乐播放
             audio.onplay = function () {
-                lycWrapper.setLrcScrollerTimer();
+                onResetLyricTimer.call(self, true)
+                // lycWrapper.setLrcScrollerTimer();
             };
             //音乐暂停
             audio.onpause = function () {
-                lycWrapper.removeLrcScrollerTimer();
+                onResetLyricTimer.call(self, false)
+                // lycWrapper.removeLrcScrollerTimer();
             };
             //音乐结束
             audio.onended = function () {
                 //设置旋转动画
-                infoWrapper.setTransformStyle();
+                onSetTransformStyle.call(self);
                 onSetPlayingStatus(false);
                 //设置歌词滚动序号
                 onSetLyricIndex(0);
                 //删除歌词滚动timer
-                lycWrapper.removeLrcScrollerTimer();
+                // lycWrapper.removeLrcScrollerTimer();
+                onResetLyricTimer.call(self, false)
+
             }
             audio.autoplay = autoPlay;
             autoPlay && audio.play();

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { GET_SONG_DETAIL, GET_SONG_PLAY, GET_SONG_LYRIC } from '@/constants/API'
+import { GET_SONG_DETAIL, GET_SONG_PLAY } from '@/constants/API'
 // import lyricConverter from '@/shared/lyric'
 import SongInfoARMap from '@/store/songInfo'
 import SongPlayARMap from '@/store/songPlay'
@@ -14,8 +14,9 @@ export default connect(
     {
         onSongInfoSuccess: SongInfoARMap.actionCreators.onSuccess,
         onSongInfoAsync: SongInfoARMap.actionCreators.onAsync,
-        onSongPlayAsync: SongPlayARMap.actionCreators.onAsync,
-        onSongLyricAsync: SongLyricARMap.actionCreators.onAsync
+        onSongPlayAsync: SongPlayARMap.actionCreators.onAsync
+        // ,
+        // onSongLyricAsync: SongLyricARMap.actionCreators.onAsync
         // ,
         // onSetLyricOtherData: SongLyricARMap.actionCreators.onSetOtherData
     }
@@ -66,16 +67,29 @@ export default connect(
                 onSongInfoSuccess(Object.assign({}, { data: res[0] }, {
                     loaded: true
                 }));
-            }).then(() => {
-                if (!SongError && !SongPlayError) {
-                    onSongLyricAsync({
-                        url: GET_SONG_LYRIC,
-                        params: {
-                            id
-                        }
-                    })
-                }
-            });
+            })
+            // .then(() => {
+            //     if (!SongError && !SongPlayError) {
+            //         onSongLyricAsync({
+            //             url: GET_SONG_LYRIC,
+            //             params: {
+            //                 id
+            //             }
+            //         })
+            //     }
+            // });
+        }
+        onChangePlayStatus = (status) => {
+            this.playComp.el[status]();
+        }
+        onResetLyricTimer = (status) => {
+            let wrappedLyricComp = this.lyricComp;
+            status
+                ? wrappedLyricComp.addLyricScrollerTimer(this.playComp.el)
+                : wrappedLyricComp.removeLyricScrollerTimer()
+        }
+        onSetTransformStyle = () => {
+            this.infoComp.setTransformStyle();
         }
         render() {
             let { Song } = this.props,
@@ -98,9 +112,20 @@ export default connect(
                                     <div className="m-scroll_scroller m-scroll_scroller_vertical">
                                         <div className="m-song_newfst">
                                             {/* <span className="m-logo"></span> */}
-                                            <SongInfoComp ref={infoComp => this.infoComp = infoComp} />
-                                            <SongLyricComp ref={lyricComp => this.lyricComp = lyricComp} />
-                                            <SongPlayComp ref={playComp => this.playComp = playComp} />
+                                            <SongInfoComp
+                                                ref={infoComp => this.infoComp = infoComp && infoComp.getWrappedInstance()}
+                                                onChangePlayStatus={this.onChangePlayStatus}
+                                            />
+                                            <SongLyricComp
+                                                ref={lyricComp => this.lyricComp = lyricComp && lyricComp.getWrappedInstance()}
+                                            />
+                                            <SongPlayComp
+                                                ref={playComp => this.playComp = playComp && playComp.getWrappedInstance()}
+                                                onResetLyricTimer={this.onResetLyricTimer}
+                                                onSetTransformStyle={
+                                                    this.onSetTransformStyle
+                                                }
+                                            />
                                             <div>
                                                 <div className="m-giude" style={{ bottom: '-14px' }}>
                                                     <i className="arr ani"></i>

@@ -5,7 +5,9 @@ import cn from 'classnames'
 import SongPlayARMap from '@/store/songPlay'
 export default connect(
     ({ app: { Song, SongPlay } }) => ({ Song, SongPlay }),
-    { onSetPlayingStatus: SongPlayARMap.actionCreators.onPlayingSet },
+    {
+        onSetPlayingStatus: SongPlayARMap.actionCreators.onPlayingSet
+    },
     null,
     {
         withRef: true
@@ -16,44 +18,54 @@ export default connect(
             transform: PropTypes.string,
             parent: PropTypes.object
         }
-        state = {
-            transformStyle: {}
-        }
+        state = (function () {
+            let playing = this.props.SongPlay.data.playing;
+            return {
+                isPause: !playing,
+                circlingCls: cn({
+                    'a-circling': playing
+                }),
+                transformStyle: {}
+            }
+        }).call(this)
         setTransformStyle() {
             let songImg = this.roll,
                 songWrap = this.turn,
                 transformKey = this.context.transform,
                 songImgTransform = getComputedStyle(songImg, null)[transformKey],
                 songWrapTransform = getComputedStyle(songWrap, null)[transformKey];
-            let transform = songWrapTransform === 'none' ? songImgTransform : songImgTransform.concat(' ', songWrapTransform);
+            let transform = songWrapTransform === 'none'
+                ? songImgTransform
+                : songImgTransform.concat(' ', songWrapTransform);
             this.setState(prevState => {
                 return {
-                    [transformKey]: transform
+                    transformStyle: {
+                        [transformKey]: transform
+                    }
                 }
             })
         }
         changePlayStatus = () => {
-            let { SongPlay, onSetPlayingStatus } = this.props,
-                currentStatus = !SongPlay.data.playing,
-                playWrapper = this.context.parent.playComp.getWrappedInstance();
-            if (!currentStatus && !playWrapper.el.ended) {
+            //父组件传入控制SongPlay状态的方法属性 onChangePlayStatus
+            let { SongPlay, onSetPlayingStatus, onChangePlayStatus } = this.props,
+                currentStatus = this.state.isPause;
+            // playWrapper = this.context.parent.playComp.getWrappedInstance();
+            // && !playWrapper.el.ended
+            if (!currentStatus) {
                 this.setTransformStyle();
                 onSetPlayingStatus(false);
-                playWrapper.el.pause();
+                onChangePlayStatus('pause');
+                // playWrapper.el.pause();
             } else {
                 onSetPlayingStatus(true);
-                playWrapper.el.play();
+                onChangePlayStatus('play');
+                // playWrapper.el.play();
             }
         }
         render() {
             let { Song, SongPlay } = this.props,
                 SongData = Song.data;
-            let { transformStyle } = this.state,
-                isPause = !SongPlay.data.playing,
-                circlingCls = cn({
-                    'a-circling': !isPause
-                });
-            console.log('isPause:', isPause);
+            let { transformStyle, isPause, circlingCls } = this.state;
             return (
                 <div className="m-song-wrap" >
                     <div className="m-song-disc">

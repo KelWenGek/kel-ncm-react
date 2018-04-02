@@ -1,15 +1,25 @@
 import React, { Component } from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { createMatchSelector } from '@/router/selectors'
 import PropTypes from 'prop-types'
 import cn from 'classnames'
 import findIndex from 'lodash/findIndex'
+import { GET_SONG_LYRIC } from '@/constants/API'
 import SongLyricARMap from '@/store/songLyric'
+import SongPlayARMap from '@/store/songPlay'
 import lyricConverter from '@/shared/lyric'
 export default connect(
-    ({ app: { LyricIndex, Song, SongLyric, SongLyricLoading } }) => ({ Song, SongLyric, SongLyricLoading }),
+    state => {
+        let { app: { LyricIndex, Song, SongLyric, SongLyricLoading } } = state;
+        let match = createMatchSelector('/m/song/:id')(state);
+        return { Song, SongLyric, SongLyricLoading, match }
+    },
     {
+        onPlayStatusSet: SongPlayARMap.actionCreators.onPlayingSet,
         onSetLyricOtherData: SongLyricARMap.actionCreators.onSetOtherData,
-        onSetLyricIndex: SongLyricARMap.actionCreators.onSetLyricIndex
+        onSetLyricIndex: SongLyricARMap.actionCreators.onSetLyricIndex,
+        onSongLyricAsync: SongLyricARMap.actionCreators.onAsync
     },
     null,
     {
@@ -21,9 +31,28 @@ export default connect(
             transform: PropTypes.string,
             parent: PropTypes.object
         }
-        getScrollerTransform = () => {
-            let { LyricIndex, SongLyric } = this.props,
-                current = 0,
+        state = {
+            lrcTransCls: this.getLrcTransCls(this.props),
+            lrcScrollerStyle: this.getLrcScrollerStyle(this.props),
+            scrollerTransform: this.getScrollerTransform(this.props)
+        }
+        getLrcTransCls({ SongLyric }) {
+            let SongLyricData = SongLyric.data;
+            return cn({
+                'm-song-scroll': true,
+                'm-song-lrtrans': SongLyricData && SongLyricData.hasTrans
+            });
+        }
+        getLrcScrollerStyle({ SongLyric }) {
+            let SongLyricData = SongLyric.data;
+            return SongLyricData && SongLyricData._other.outerHeight
+                ? {
+                    height: SongLyricData._other.outerHeight + 'px'
+                }
+                : {}
+        }
+        getScrollerTransform({ LyricIndex, SongLyric }) {
+            let current = 0,
                 transformKey = this.context.transform,
                 heights = SongLyric.data && SongLyric.data._other.heights;
             if (heights) {
@@ -42,10 +71,32 @@ export default connect(
                 [transformKey]: `translateY(0px)`
             }
         }
-        setLrcScrollerTimer() {
+        componentDidMount() {
+            let { onSongLyricAsync, onPlayStatusSet, match: { params } } = this.props;
+            onSongLyricAsync({
+                url: GET_SONG_LYRIC,
+                params
+            }).then(() => {
+                onPlayStatusSet(true);
+                setTimeout(() => {
+                    this.resize();
+                }, 0);
+            })
+            window.addEventListener('resize', this.resize, false);
+        }
+        componentWillReceiveProps(nextProps) {
+            this.setState(prevState => {
+                return {
+                    lrcTransCls: this.getLrcTransCls(nextProps),
+                    lrcScrollerStyle: this.getLrcScrollerStyle(nextProps),
+                    scrollerTransform: this.getScrollerTransform(nextProps)
+                }
+            })
+        }
+        addLyricScrollerTimer(audio) {
             let lines = this.props.SongLyric.data.lines,
-                onSetLyricIndex = this.props.onSetLyricIndex,
-                audio = this.context.parent.playComp.getWrappedInstance().el;
+                onSetLyricIndex = this.props.onSetLyricIndex;
+            // audio = this.context.parent.playComp.getWrappedInstance().el;
             this.start = Date.now() - audio.currentTime * 1000
             this.lyrSclTimer = setInterval(() => {
                 this.now = Date.now();
@@ -60,15 +111,15 @@ export default connect(
                 current !== this.last && (
                     this.last = current,
                     onSetLyricIndex(current),
-                    this.setLrcScrollerTransform()
+                    this.addHighlightToCurrentLine()
                 );
             }, 16);
         }
-        removeLrcScrollerTimer() {
+        removeLyricScrollerTimer() {
             this.lyrSclTimer && clearInterval(this.lyrSclTimer);
             this.lyrSclTimer = null;
         }
-        setLrcScrollerTransform() {
+        addHighlightToCurrentLine() {
             Promise.resolve().then(() => {
                 let scrollerEl = this.lycScl, LyricIndex = this.props.LyricIndex;
                 if (LyricIndex > 0) {
@@ -92,29 +143,10 @@ export default connect(
         removeResize = () => {
             window.removeEventListener('resize', this.resize);
         }
-
-        componentDidMount() {
-            setTimeout(() => {
-                this.resize();
-            }, 0);
-            window.addEventListener('resize', this.resize, false);
-        }
-
         render() {
             let { Song, SongLyric, SongLyricLoading } = this.props,
-                SongData = Song.data, SongLyricData = SongLyric.data,
-                lrcTransCls = cn({
-                    'm-song-scroll': true,
-                    'm-song-lrtrans': SongLyricData && SongLyricData.hasTrans
-                }),
-                lrcScrollerStyle = SongLyricData && SongLyricData._other.outerHeight
-                    ?
-                    {
-                        height: SongLyricData._other.outerHeight + 'px'
-                    }
-                    :
-                    {},
-                scrollerTransform = this.getScrollerTransform();
+                SongData = Song.data, SongLyricData = SongLyric.data;
+            let { lrcScrollerStyle, lrcTransCls, scrollerTransform } = this.state;
             return (
                 <div className="m-song-info">
                     <h2 className="m-song-h2">
@@ -124,7 +156,6 @@ export default connect(
                     </h2>
                     <div className="m-song-lrc f-pr">
                         {
-
                             SongLyricLoading
                                 ?
                                 <p className="m-song-lremp">歌词正在加载...</p>
