@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import SearchResultARMap from '@/store/searchResult'
+import { definition as searchDefinition } from '@/store/search';
 export default connect(
-    ({ app: { SearchHot, SearchResult, SearchKeyword } }) => ({ SearchHot, SearchResult, SearchKeyword }),
-    { onSearchResultAsync: SearchResultARMap.actionCreators.onAsync }
+    ({ app: { search: { searchHot, searchResult, searchKeyword } } }) => ({ SearchHot: searchHot, SearchResult: searchResult, SearchKeyword: searchKeyword }),
+    { onSearchResultAsync: searchDefinition.result.actionCreators.onSearchResultAsync }
 )(
     class SearchHotComp extends Component {
         render() {
             let { SearchHot, SearchResult, SearchKeyword, onSearchResultAsync } = this.props;
-            let hasHot = SearchHot && SearchHot.data.length > 0, hasResult = SearchResult && SearchResult.data.length > 0;
+            let hasHot = SearchHot.data && SearchHot.data.length > 0, hasResult = SearchResult.data && SearchResult.data.length > 0;
             return (
                 !SearchKeyword && !hasResult &&
                 < section className="m-hotlist" >

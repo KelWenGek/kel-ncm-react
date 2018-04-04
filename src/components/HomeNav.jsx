@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import HomeTabCurIdxARMap from '@/store/homeTabCurIdx';
+import { definition as homeDefinition } from '@/store/home';
 import cn from 'classnames'
 export default connect(
-    ({ app: { HomeTabCurIdx } }) => ({ HomeTabCurIdx }),
-    { onTabChange: HomeTabCurIdxARMap.actionCreators.onChange }
+    ({ app: { home: { curTabIndex } } }) => ({ HomeTabCurIdx: curTabIndex }),
+    { onTabChange: homeDefinition.result.actionCreators.onTabChange }
 )(
     class HomeNav extends Component {
         static selections = ['推荐歌曲', '热歌榜', '搜索'];

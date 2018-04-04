@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-// import wrapSong from '@/hoc/wrapSong'
+import { definition as searchDefinition } from '@/store/search';
+
 export default connect(
-    ({ app: { SearchResult, SearchResultLoading, SearchKeyword } }) => ({ SearchResult, SearchResultLoading, SearchKeyword })
+    ({ app: { search: { searchResult, searchResultLoading, searchKeyword } } }) => ({ SearchResult: searchResult, SearchResultLoading: searchResultLoading, SearchKeyword: searchKeyword })
 )(class SearchResultComp extends Component {
     render() {
         let { SearchResult, SearchKeyword, SearchResultLoading } = this.props,
-            hasResult = SearchResult && SearchResult.data.length > 0;
+            hasResult = SearchResult.data && SearchResult.data.length > 0;
         return (
             <div className="m-searchresult">
                 {

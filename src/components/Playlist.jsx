@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import cn from 'classnames';
-import PlaylistARMap from '@/store/playlist';
-import { GET_PLAYLIST_DETAIL, GET_PLAYLIST_COMMENT } from '@/constants/API';
+import { definition as playlistDefinition } from '@/store/playlist';
 import PlaylistComment from './PlaylistComment';
 export default connect(
-    ({ app: { Playlist, PlaylistLoading } }) => ({ Playlist, PlaylistLoading }),
+    ({ app: { playlist: { playlist, playlistLoading } } }) => ({ Playlist: playlist, PlaylistLoading: playlistLoading }),
     {
-        onPlaylistAsync: PlaylistARMap.actionCreators.onAsync,
-        onPlaylistCommentAsync: PlaylistARMap.actionCreators.onAsyncComment
+        onPlaylistAsync: playlistDefinition.result.actionCreators.onPlaylistAsync,
+        onPlaylistCommentAsync: playlistDefinition.result.actionCreators.onPlaylistCommentAsync
     }
 )(
     class Playlist extends Component {
@@ -24,26 +23,18 @@ export default connect(
             })
         }
         componentDidMount() {
-            let { match: { params }, onPlaylistAsync, onPlaylistCommentAsync } = this.props;
-            onPlaylistAsync({
-                url: GET_PLAYLIST_DETAIL,
-                params
-            }).then((result) => {
+            let { match: { params }, Playlist, onPlaylistAsync, onPlaylistCommentAsync } = this.props;
+            Playlist.loaded || onPlaylistAsync(params).then((result) => {
                 document.title = result.name;
-                onPlaylistCommentAsync({
-                    url: GET_PLAYLIST_COMMENT,
-                    params
-                })
+                onPlaylistCommentAsync(params)
             });
         }
         render() {
-            let creator, tracks;
-            let { Playlist, PlaylistLoading } = this.props;
+            let { Playlist, PlaylistLoading } = this.props, creator, tracks;
             let { isExpanded } = this.state;
-            if (Playlist) {
+            if (Playlist = Playlist.data) {
                 ({ creator, tracks } = Playlist);
             }
-
             return (
                 PlaylistLoading
                     ? <span className="u-spin"></span>

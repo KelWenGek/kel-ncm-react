@@ -2,22 +2,20 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PlaylistCommentItem from './PlaylistCommentItem'
 export default connect(
-    ({ app: { Playlist } }) => ({ Playlist })
+    ({ app: { playlist: { playlistComment, playlistCommentLoading } } }) => ({ PlaylistComment: playlistComment, PlaylistCommentLoading: playlistCommentLoading })
 )(
     class PlaylistComment extends Component {
         render() {
-            let hotComments, comments, total, more;
-            let { Playlist } = this.props;
-            if (Playlist.cmt) {
-                ({ hotComments, comments, total, more } = Playlist.cmt);
+            let { PlaylistComment, PlaylistCommentLoading } = this.props, hotComments, comments, total, more, hasComment = !!PlaylistComment.data;
+            if (hasComment) {
+                ({ hotComments, comments, total, more } = PlaylistComment.data);
             }
             return (
                 <div className="m-talk">
                     {
-                        !Playlist.cmt
+                        PlaylistCommentLoading
                             ? <span className="u-spin"></span>
-                            :
-                            <div>
+                            : hasComment && <div>
                                 <PlaylistCommentItem key={hotComments[0].commentId} title={'精彩评论'} comments={hotComments} />
                                 <PlaylistCommentItem key={comments[0].commentId} title={`最新评论(${total})`} comments={comments} />
                                 {

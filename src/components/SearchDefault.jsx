@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import SearchHotComp from '@/components/SearchHot'
-import SearchHotARMap from '@/store/searchHot'
+import { definition as searchDefinition } from '@/store/search';
 // import SearchHistoryComp from '@/components/SearchHistory'
 export default connect(
-    ({ app: { SearchHot } }) => ({ SearchHot }),
-    { onSearchHotAsync: SearchHotARMap.actionCreators.onAsync }
+    ({ app: { search: { searchHot } } }) => ({ SearchHot: searchHot }),
+    { onSearchHotAsync: searchDefinition.result.actionCreators.onSearchHotAsync }
 )(
     class SearchDefaultComp extends Component {
 

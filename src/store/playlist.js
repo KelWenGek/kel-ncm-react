@@ -1,55 +1,67 @@
-import { createTypes, completeTypes, completeReducer } from '@/compose';
-import { fetch } from '@/config/request';
-export const actions = createTypes(completeTypes(['GET_PLAYLIST', 'GET_PLAYLIST_COMMENT']), 'PLAYLIST')
-const actionReducerMap = completeReducer(
-    function (reducerHandlers, actionCreators) {
-        return {
-            actionCreators: {
-                onAsync: options => async (dispatch, getState) => {
-                    return fetch({
-                        options, dispatch, actionCreators
-                    }).then(({ data }) => {
-                        if (data.code === 200) {
-                            dispatch(
-                                actionCreators.onSuccess(
-                                    Object.assign({}, getState().app.Playlist || {}, data.playlist)
-                                )
-                            );
-                            return Promise.resolve(data.playlist);
-                        } else {
-                            let err = {
+import { mergeDeep } from 'immutable';
+import { completeModule, createReducer } from '@/state-management-composer';
+import httpClient from '@/config/request';
+import * as API from '@/constants/API';
+import { OK } from '@/constants/STATUS_CODE'
+const definition = completeModule(
+    {
+        namespace: 'PLAYLIST',
+        mapTypesToModule: [],
+        mapTargetsToModule: ['playlist', 'playlistComment'],
+        mapDefinitionToModule({ types, reducerHandlers, actionCreators }) {
+            return {
+                initialState: {},
+                actionCreators: {
+                    ...actionCreators,
+                    onPlaylistAsync: params => async dispatch => {
+                        return httpClient({
+                            url: API.GET_PLAYLIST_DETAIL,
+                            shouldLoading: true,
+                            target: 'playlist',
+                            error: {
                                 message: '获取歌单详情失败'
-                            };
-                            dispatch(actionCreators.onFailure(err));
-                        }
-                    });
-                },
-                onAsyncComment: options => async (dispatch, getState) => {
-                    return fetch({
-                        options, dispatch, actionCreators
-                    }).then(({ data }) => {
-                        if (data.code === 200) {
-                            dispatch(
-                                actionCreators.onSuccess(
-                                    Object.assign({}, getState().app.Playlist || {}, { cmt: data })
-                                )
-                            );
-                        } else {
-                            let err = {
+                            },
+                            params
+                        }).then(({ data }) => {
+                            if (data.code === OK) {
+                                dispatch(actionCreators.onPlaylistSuccess({
+                                    data: {
+                                        loaded: true,
+                                        data: data.playlist
+                                    }
+                                }));
+                                return Promise.resolve(data.playlist);
+                            }
+                        });
+                    },
+                    onPlaylistCommentAsync: params => async dispatch => {
+                        await httpClient({
+                            url: API.GET_PLAYLIST_COMMENT,
+                            error: {
                                 message: '获取歌单评论失败'
-                            };
-                            dispatch(actionCreators.onFailure(err));
-                        }
-                    });
+                            },
+                            target: 'playlistComment',
+                            params
+                        }).then(({ data }) => {
+                            if (data.code === OK) {
+                                dispatch(actionCreators.onPlaylistCommentSuccess({
+                                    data: {
+                                        loaded: true,
+                                        data: data
+                                    }
+                                }));
+                            }
+                        });
+                    }
+                },
+                reducerHandlers: {
+                    ...reducerHandlers
                 }
             }
         }
-    },
-    {
-        target: 'Playlist',
-        primaryActions: [actions.GET_PLAYLIST, actions.GET_PLAYLIST_COMMENT]
     }
 );
 
-export default actionReducerMap;
+const reducer = createReducer(definition.result.initialState, definition.result.reducerHandlers);
+export { definition, reducer };
 

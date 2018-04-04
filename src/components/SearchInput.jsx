@@ -1,17 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import debounce from 'lodash/debounce';
-import SearchInputARMap from '@/store/searchInput';
-import SearchSuggestARMap from '@/store/searchSuggest';
-import SearchResultARMap from '@/store/searchResult';
+import { definition as searchDefinition } from '@/store/search';
 import cn from 'classnames'
 export default connect(
-    ({ app: { SearchKeyword } }) => ({ SearchKeyword }),
+    ({ app: { search: { searchKeyword } } }) => ({ SearchKeyword: searchKeyword }),
     {
-        onKeywordSet: SearchInputARMap.actionCreators.onSet,
-        onKeywordClear: SearchInputARMap.actionCreators.onClear,
-        onSearchSuggestAsync: SearchSuggestARMap.actionCreators.onAsync,
-        onSearchResultAsync: SearchResultARMap.actionCreators.onAsync
+        onKeywordSet: searchDefinition.result.actionCreators.onKeywordSet,
+        onKeywordClear: searchDefinition.result.actionCreators.onKeywordClear,
+        onSearchSuggestAsync: searchDefinition.result.actionCreators.onSearchSuggestAsync,
+        onSearchResultAsync: searchDefinition.result.actionCreators.onSearchResultAsync
 
     }
 )(
@@ -48,7 +46,7 @@ export default connect(
                     <div className="inputcover">
                         <i className="u-svg u-svg-srch" onClick={this.getSearchResultByKeyword}></i>
                         <input
-                            type="search"
+                            type="text"
                             name="search"
                             className="input"
                             placeholder=""

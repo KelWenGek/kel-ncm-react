@@ -1,19 +1,18 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import debounce from 'lodash/debounce';
-import axios from 'axios'
-import SearchResultARMap from '@/store/searchResult'
+import { definition as searchDefinition } from '@/store/search';
 export default connect(
-    ({ app: { SearchKeyword, SearchSuggest, SearchResult, SearchSuggestLoading } }) => ({ SearchKeyword, SearchSuggest, SearchResult, SearchSuggestLoading }),
+    ({ app: { search: { searchKeyword, searchSuggest, searchResult, searchSuggestLoading } } }) => ({ SearchKeyword: searchKeyword, SearchSuggest: searchSuggest, SearchResult: searchResult, SearchSuggestLoading: searchSuggestLoading }),
     {
-        onSearchResultAsync: SearchResultARMap.actionCreators.onAsync
+        onSearchResultAsync: searchDefinition.result.actionCreators.onSearchResultAsync
     }
 )(
     class SearchSuggestComp extends Component {
         render() {
             let { SearchKeyword, SearchSuggest, SearchResult, SearchSuggestLoading, onSearchResultAsync } = this.props,
-                hasSuggest = SearchSuggest && SearchSuggest.data.length > 0,
-                hasResult = SearchResult && SearchResult.data.length > 0;
+                hasSuggest = SearchSuggest.data && SearchSuggest.data.length > 0,
+                hasResult = SearchResult.data && SearchResult.data.length > 0;
             return (
                 (!hasResult && SearchKeyword) &&
                 <section className="m-recom" >

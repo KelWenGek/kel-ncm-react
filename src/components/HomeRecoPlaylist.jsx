@@ -3,12 +3,13 @@ import { connect } from 'react-redux'
 import EmptyComp from '@/components/Empty'
 
 export default connect(
-    ({ app: { HomeRecoPlaylist, HomeRecoPlaylistLoading } }) => ({ HomeRecoPlaylist, HomeRecoPlaylistLoading })
+    ({ app: { home: { recoPlaylist, recoPlaylistLoading } } }) => ({ HomeRecoPlaylist: recoPlaylist, HomeRecoPlaylistLoading: recoPlaylistLoading })
 )(
     class HomeRecoPlaylistComp extends Component {
         render() {
             let { HomeRecoPlaylist, HomeRecoPlaylistLoading } = this.props,
-                recoPlaylist = [HomeRecoPlaylist.data.slice(0, 3), HomeRecoPlaylist.data.slice(3, 6)]
+                hasItem = HomeRecoPlaylist.data && HomeRecoPlaylist.data.length > 0,
+                recoPlaylist = hasItem ? [HomeRecoPlaylist.data.slice(0, 3), HomeRecoPlaylist.data.slice(3, 6)] : [];
             return (
                 <div>
                     <h2 className="remd_tl">
@@ -18,7 +19,7 @@ export default connect(
                         {
                             HomeRecoPlaylistLoading
                                 ? <div className="u-spin"></div>
-                                : HomeRecoPlaylist.data.length
+                                : hasItem
                                     ? recoPlaylist.map((list) => {
                                         return (
                                             <div key={list[0].id} className="remd_ul" >

@@ -4,24 +4,19 @@ import cn from 'classnames';
 import { pad } from '@/shared/util';
 import { GET_HOME_TOP } from '@/constants/API';
 import Empty from '@/components/Empty'
-import HomeHotListARMap from '@/store/homeHotList'
+import { definition as homeDefinition } from '@/store/home';
 export default connect(
-    ({ app: { HomeHotListLoading, HomeHotList } }) => ({ HomeHotListLoading, HomeHotList }),
-    { onHotListAsync: HomeHotListARMap.actionCreators.onAsync }
+    ({ app: { home: { hotListLoading, hotList } } }) => ({ HomeHotListLoading: hotListLoading, HomeHotList: hotList }),
+    { onHotListAsync: homeDefinition.result.actionCreators.onHotListAsync }
 )(class HomeHotList extends Component {
 
     componentDidMount() {
         let { onHotListAsync, HomeHotList } = this.props;
-        HomeHotList.loaded || onHotListAsync({
-            url: GET_HOME_TOP,
-            params: {
-                idx: 1
-            }
-        });
+        HomeHotList.loaded || onHotListAsync();
     }
     render() {
         let { HomeHotList, HomeHotListLoading } = this.props;
-        let hasItem = HomeHotList.data.length > 0;
+        let hasItem = HomeHotList.data && HomeHotList.data.length > 0;
         return (
             <div className="m-hmhot">
                 {

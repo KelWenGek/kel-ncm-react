@@ -3,26 +3,21 @@ import { connect } from 'react-redux'
 import { GET_HOME_PLAYLIST, GET_HOME_NEWSONGS } from '@/constants/API'
 import EmptyComp from '@/components/Empty'
 import HomeRecoNewsgComp from '@/components/HomeRecoNewsg'
-import HomeRecoNewsgARMap from '@/store/homeRecoNewsg'
 import HomeRecoPlaylistComp from '@/components/HomeRecoPlaylist'
-import HomeRecoPlaylistARMap from '@/store/homeRecoPlaylist'
+import { definition as homeDefinition } from '@/store/home';
 export default connect(
-    ({ app: { HomeRecoNewsg, HomeRecoPlaylist } }) => ({ HomeRecoNewsg, HomeRecoPlaylist }),
+    ({ app: { home: { recoNewsg, recoPlaylist } } }) => ({ HomeRecoNewsg: recoNewsg, HomeRecoPlaylist: recoPlaylist }),
     {
-        onNewsgAsync: HomeRecoNewsgARMap.actionCreators.onAsync,
-        onPlaylistAsync: HomeRecoPlaylistARMap.actionCreators.onAsync
+        onNewsgAsync: homeDefinition.result.actionCreators.onRecoNewsgAsync,
+        onPlaylistAsync: homeDefinition.result.actionCreators.onRecoPlaylistAsync
     }
 )(
     class HomeRecoComp extends Component {
 
         componentDidMount() {
             let { HomeRecoNewsg, HomeRecoPlaylist, onNewsgAsync, onPlaylistAsync } = this.props;
-            HomeRecoNewsg.loaded || onNewsgAsync({
-                url: GET_HOME_NEWSONGS
-            });
-            HomeRecoPlaylist.loaded || onPlaylistAsync({
-                url: GET_HOME_PLAYLIST
-            });
+            HomeRecoNewsg.loaded || onNewsgAsync();
+            HomeRecoPlaylist.loaded || onPlaylistAsync();
         }
         render() {
             return (

@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import EmptyComp from '@/components/Empty'
 export default connect(
-    ({ app: { HomeRecoNewsg, HomeRecoNewsgLoading } }) => ({ HomeRecoNewsg, HomeRecoNewsgLoading })
+    ({ app: { home: { recoNewsg, recoNewsgLoading } } }) => ({ HomeRecoNewsg: recoNewsg, HomeRecoNewsgLoading: recoNewsgLoading })
 )(
     class HomeRecoNewsgComp extends Component {
         render() {
-            let { HomeRecoNewsg, HomeRecoNewsgLoading } = this.props;
+            let { HomeRecoNewsg, HomeRecoNewsgLoading } = this.props,
+                hasItem = HomeRecoNewsg.data && HomeRecoNewsg.data.length > 0;
             return (
                 <div>
                     <h2 className="remd_tl">
@@ -18,7 +19,7 @@ export default connect(
                                 ? <div className="u-spin"></div>
                                 : <div className="m-sglst">
                                     {
-                                        HomeRecoNewsg.data.length ? HomeRecoNewsg.data.map(({ id, name, song: { alias: alia, artists: ar, album: al } }) => (
+                                        hasItem ? HomeRecoNewsg.data.map(({ id, name, song: { alias: alia, artists: ar, album: al } }) => (
                                             <a className="m-sgitem" key={id} href={`/m/song/${id}`}>
 
                                                 <div className="sgfr f-bd f-bd-btm">
