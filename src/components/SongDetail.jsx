@@ -1,30 +1,50 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import findIndex from 'lodash/findIndex'
 import { GET_SONG_DETAIL, GET_SONG_PLAY } from '@/constants/API'
-// import lyricConverter from '@/shared/lyric'
-import SongInfoARMap from '@/store/songInfo'
-import SongPlayARMap from '@/store/songPlay'
-import SongLyricARMap from '@/store/songLyric'
+import lyricConverter from '@/shared/lyric'
+import { definition as songDefinition } from '@/store/song'
 import SongInfoComp from './SongInfo'
 import SongLyricComp from './SongLyric'
 import SongPlayComp from './SongPlay'
 export default connect(
-    ({ app: { Song, SongLyric, SongError, SongPlayError } }) => ({ Song, SongLyric, SongError, SongPlayError }),
+    ({
+        app: {
+            song:
+            {
+                lyricIndex,
+                song,
+                songLyric,
+                songError,
+                songPlayError
+            }
+        }
+    }) => ({
+        LyricIndex: lyricIndex,
+        Song: song,
+        SongLyric: songLyric,
+        SongError: songError,
+        SongPlayError: songPlayError
+    }),
     {
-        onSongInfoSuccess: SongInfoARMap.actionCreators.onSuccess,
-        onSongInfoAsync: SongInfoARMap.actionCreators.onAsync,
-        onSongPlayAsync: SongPlayARMap.actionCreators.onAsync
-        // ,
-        // onSongLyricAsync: SongLyricARMap.actionCreators.onAsync
-        // ,
-        // onSetLyricOtherData: SongLyricARMap.actionCreators.onSetOtherData
+        onSongSuccess: songDefinition.result.actionCreators.onSongSuccess,
+        onSongDetailAsync: songDefinition.result.actionCreators.onSongDetailAsync,
+        onSongPlayAsync: songDefinition.result.actionCreators.onSongPlayAsync,
+        onSongLyricAsync: songDefinition.result.actionCreators.onSongLyricAsync,
+        onSetPlayingStatus: songDefinition.result.actionCreators.onSetPlayingStatus,
+        onSetLyricOtherData: songDefinition.result.actionCreators.onSetLyricOtherData,
+        onSetLyricCurrentIndex: songDefinition.result.actionCreators.onSetLyricCurrentIndex
     }
 )(
     class SongDetail extends Component {
         static childContextTypes = {
             transform: PropTypes.string,
             parent: PropTypes.object
+        }
+
+        state = {
+            lyricIndex: 0
         }
         getChildContext() {
             return {
@@ -42,59 +62,111 @@ export default connect(
             let { match: { params: { id } },
                 SongPlayError,
                 SongError,
-                onSongInfoAsync,
+                onSongDetailAsync,
                 onSongPlayAsync,
-                onSongInfoSuccess,
-                onSongLyricAsync
+                onSongSuccess,
+                onSongLyricAsync,
+                onSetPlayingStatus
             } = this.props;
             Promise.all(
                 [
-                    onSongInfoAsync({
-                        url: GET_SONG_DETAIL,
-                        params: {
-                            ids: id
-                        }
-                    }),
-                    onSongPlayAsync({
-                        url: GET_SONG_PLAY,
-                        params: {
-                            id
-                        }
-                    })
+                    onSongDetailAsync(id),
+                    onSongPlayAsync(id)
                 ]
             ).then((res) => {
                 //歌曲信息和链接都获取成功之后
-                onSongInfoSuccess(Object.assign({}, { data: res[0] }, {
-                    loaded: true
+                onSongSuccess(Object.assign({}, {
+                    data: {
+                        loaded: true
+                    }
                 }));
+            }).then(() => {
+                if (!SongError && !SongPlayError) {
+                    onSongLyricAsync(id).then(() => {
+                        onSetPlayingStatus(true);
+                    })
+                    setTimeout(() => {
+                        this.resize();
+                    });
+                }
             })
-            // .then(() => {
-            //     if (!SongError && !SongPlayError) {
-            //         onSongLyricAsync({
-            //             url: GET_SONG_LYRIC,
-            //             params: {
-            //                 id
-            //             }
-            //         })
-            //     }
-            // });
+
+            window.addEventListener('resize', this.resize, false);
+        }
+
+
+
+        addLyricScrollerTimer(audio) {
+            let lines = this.props.SongLyric.data.lines,
+                onSetLyricCurrentIndex = this.props.onSetLyricCurrentIndex;
+            // audio = this.context.parent.playComp.getWrappedInstance().el;
+            this.start = Date.now() - audio.currentTime * 1000
+            this.lyrSclTimer = setInterval(() => {
+                this.now = Date.now();
+                let slaped = this.now - this.start,
+                    current = findIndex(lines, (lyr, index) => {
+                        return index === lines.length - 1 ||
+                            (
+                                slaped >= lyr.time * 1000 &&
+                                slaped <= lines[index + 1].time * 1000
+                            )
+                    });
+                current !== this.last && (
+                    this.last = current,
+                    this.setState(prevState => {
+                        return {
+                            lyricIndex: current
+                        }
+                    }),
+                    this.SongLyricComp.addHighlightToCurrentLine()
+                );
+            }, 16);
+        }
+        removeLyricScrollerTimer() {
+            this.lyrSclTimer && clearInterval(this.lyrSclTimer);
+            this.lyrSclTimer = null;
+        }
+
+        resize = () => {
+            let { onSetLyricOtherData, SongLyric } = this.props,
+                lritems = document.querySelectorAll('.j-lritem');
+            if (!lritems || lritems.length === 0) {
+                return this.removeResize();
+            }
+            let _other = lyricConverter.getOtherData({
+                lyric: SongLyric.data,
+                lritems
+            });
+            onSetLyricOtherData(_other);
+        }
+        removeResize = () => {
+            window.removeEventListener('resize', this.resize);
         }
         onChangePlayStatus = (status) => {
             this.playComp.el[status]();
         }
         onResetLyricTimer = (status) => {
-            let wrappedLyricComp = this.lyricComp;
             status
-                ? wrappedLyricComp.addLyricScrollerTimer(this.playComp.el)
-                : wrappedLyricComp.removeLyricScrollerTimer()
+                ? this.addLyricScrollerTimer(this.playComp.el)
+                : this.removeLyricScrollerTimer()
         }
         onSetTransformStyle = () => {
             this.infoComp.setTransformStyle();
         }
+
+        onEnd() {
+            this.setState(prevState => {
+                return {
+                    lyricIndex: 0
+                }
+            })
+        }
+
         render() {
-            let { Song } = this.props,
+            let { Song, SongLyric } = this.props,
                 SongData = Song.data,
                 bgStyle;
+            let { lyricIndex } = this.state;
             SongData && (bgStyle = {
                 backgroundImage: `url( "//music.163.com/api/img/blur/${SongData.al.pic_str}")`,
                 opacity: 1
@@ -116,14 +188,15 @@ export default connect(
                                                 ref={infoComp => this.infoComp = infoComp && infoComp.getWrappedInstance()}
                                                 onChangePlayStatus={this.onChangePlayStatus}
                                             />
-                                            <SongLyricComp
-                                                ref={lyricComp => this.lyricComp = lyricComp && lyricComp.getWrappedInstance()}
-                                            />
+                                            <SongLyricComp ref={comp => this.SongLyricComp = comp} index={lyricIndex} Song={Song} SongLyric={SongLyric} />
                                             <SongPlayComp
                                                 ref={playComp => this.playComp = playComp && playComp.getWrappedInstance()}
                                                 onResetLyricTimer={this.onResetLyricTimer}
                                                 onSetTransformStyle={
                                                     this.onSetTransformStyle
+                                                }
+                                                onEnd={
+                                                    this.onEnd.bind(this)
                                                 }
                                             />
                                             <div>

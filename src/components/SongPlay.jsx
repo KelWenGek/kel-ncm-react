@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import SongPlayARMap from '@/store/songPlay'
-import SongLyricARMap from '@/store/songLyric'
+import { definition as songDefinition } from '@/store/song'
+
 export default connect(
-    ({ app: { SongPlay } }) => ({ SongPlay }),
+    ({ app: { song: { songPlay } } }) => ({ SongPlay: songPlay }),
     {
-        onSetPlayingStatus: SongPlayARMap.actionCreators.onPlayingSet,
-        onSetLyricIndex: SongLyricARMap.actionCreators.onSetLyricIndex
+        onSetPlayingStatus: songDefinition.result.actionCreators.onSetPlayingStatus,
+        onSetLyricCurrentIndex: songDefinition.result.actionCreators.onSetLyricCurrentIndex
     },
     null,
     {
@@ -19,7 +19,7 @@ export default connect(
             parent: PropTypes.object
         }
         createAudio() {
-            let { SongPlay, onSetPlayingStatus, onResetLyricTimer, onSetTransformStyle } = this.props,
+            let { SongPlay, onSetPlayingStatus, onResetLyricTimer, onSetTransformStyle, onEnd } = this.props,
                 self = this,
                 autoPlay = SongPlay.data.playing,
                 src = SongPlay.data.url,
@@ -43,7 +43,7 @@ export default connect(
                 onSetTransformStyle.call(self);
                 onSetPlayingStatus(false);
                 //设置歌词滚动序号
-                onSetLyricIndex(0);
+                onEnd();
                 //删除歌词滚动timer
                 // lycWrapper.removeLrcScrollerTimer();
                 onResetLyricTimer.call(self, false)

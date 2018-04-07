@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import cn from 'classnames'
-import SongPlayARMap from '@/store/songPlay'
+import { definition as songDefinition } from '@/store/song'
+
 export default connect(
-    ({ app: { Song, SongPlay } }) => ({ Song, SongPlay }),
+    ({ app: { song: { song, songPlay } } }) => ({ Song: song, SongPlay: songPlay }),
     {
-        onSetPlayingStatus: SongPlayARMap.actionCreators.onPlayingSet
+        onSetPlayingStatus: songDefinition.result.actionCreators.onSetPlayingStatus
     },
     null,
     {
@@ -18,16 +19,11 @@ export default connect(
             transform: PropTypes.string,
             parent: PropTypes.object
         }
-        state = (function () {
-            let playing = this.props.SongPlay.data.playing;
-            return {
-                isPause: !playing,
-                circlingCls: cn({
-                    'a-circling': playing
-                }),
-                transformStyle: {}
-            }
-        }).call(this)
+
+
+        state = {
+            transformStyle: {}
+        }
         setTransformStyle() {
             let songImg = this.roll,
                 songWrap = this.turn,
@@ -48,7 +44,7 @@ export default connect(
         changePlayStatus = () => {
             //父组件传入控制SongPlay状态的方法属性 onChangePlayStatus
             let { SongPlay, onSetPlayingStatus, onChangePlayStatus } = this.props,
-                currentStatus = this.state.isPause;
+                currentStatus = !SongPlay.data.playing;
             // playWrapper = this.context.parent.playComp.getWrappedInstance();
             // && !playWrapper.el.ended
             if (!currentStatus) {
@@ -64,8 +60,13 @@ export default connect(
         }
         render() {
             let { Song, SongPlay } = this.props,
-                SongData = Song.data;
-            let { transformStyle, isPause, circlingCls } = this.state;
+                SongData = Song.data, playing = SongPlay.data.playing;
+            let { transformStyle } = this.state;
+
+            let circlingCls = cn({
+                'a-circling': playing
+            }),
+                isPause = !playing;
             return (
                 <div className="m-song-wrap" >
                     <div className="m-song-disc">

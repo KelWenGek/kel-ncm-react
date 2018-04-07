@@ -16,7 +16,9 @@ const httpClient = axios.create({
 httpClient.interceptors.request.use(config => {
     if (config.shouldLoading) {
         let target = config.target;
-        effects.types.reduce((memo, type) => { memo[`${type}Effect`] = normalizeTypeForEffect({ effect: type, target }); return memo; }, config);
+        effects.types.reduce((memo, type) => {
+            memo[`${type}Effect`] = normalizeTypeForEffect({ effect: type, target }); return memo;
+        }, config);
         config.__store.dispatch({ type: config.loadingEffect, target })
     }
     return config;
