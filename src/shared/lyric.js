@@ -89,5 +89,17 @@ export default {
             visibleLyricCount: p,
             scrollIndex: h
         }
+    },
+    findLyricByTime(slaped, lines, curIndex = 0) {
+        var index;
+        for (var i = curIndex, len = lines.length; i < len; i++) {
+            var lyr = lines[i];
+            if (lyr.time <= slaped && i > curIndex) {
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 }
+

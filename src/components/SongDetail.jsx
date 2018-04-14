@@ -1,54 +1,45 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import findIndex from 'lodash/findIndex'
-import { GET_SONG_DETAIL, GET_SONG_PLAY } from '@/constants/API'
+import debounce from 'lodash/debounce'
 import lyricConverter from '@/shared/lyric'
 import { definition as songDefinition } from '@/store/song'
 import SongInfoComp from './SongInfo'
 import SongLyricComp from './SongLyric'
-import SongPlayComp from './SongPlay'
 export default connect(
     ({
         app: {
             song:
             {
-                lyricIndex,
                 song,
                 songLyric,
-                songError,
-                songPlayError
+                songPlay,
             }
         }
     }) => ({
-        LyricIndex: lyricIndex,
         Song: song,
         SongLyric: songLyric,
-        SongError: songError,
-        SongPlayError: songPlayError
+        SongPlay: songPlay,
     }),
     {
         onSongSuccess: songDefinition.result.actionCreators.onSongSuccess,
         onSongDetailAsync: songDefinition.result.actionCreators.onSongDetailAsync,
         onSongPlayAsync: songDefinition.result.actionCreators.onSongPlayAsync,
         onSongLyricAsync: songDefinition.result.actionCreators.onSongLyricAsync,
-        onSetPlayingStatus: songDefinition.result.actionCreators.onSetPlayingStatus,
-        onSetLyricOtherData: songDefinition.result.actionCreators.onSetLyricOtherData,
-        onSetLyricCurrentIndex: songDefinition.result.actionCreators.onSetLyricCurrentIndex
+        onSetPlayingStatus: songDefinition.result.actionCreators.onSetPlayingStatus
     }
 )(
     class SongDetail extends Component {
         static childContextTypes = {
-            transform: PropTypes.string,
-            parent: PropTypes.object
+            transform: PropTypes.string
         }
-
         state = {
             lyricIndex: 0
         }
         getChildContext() {
             return {
-                parent: this,
                 transform: function (e) {
                     var t = ["transform", "webkitTransform", "msTransform", "MozTransform"];
                     for (var n in t)
@@ -58,10 +49,13 @@ export default connect(
                 }(document.createElement("div"))
             }
         }
+        onSetLyricIndex = (curIndex) => {
+            this.setState({
+                lyricIndex: curIndex
+            });
+        }
         componentDidMount() {
             let { match: { params: { id } },
-                SongPlayError,
-                SongError,
                 onSongDetailAsync,
                 onSongPlayAsync,
                 onSongSuccess,
@@ -71,7 +65,8 @@ export default connect(
             Promise.all(
                 [
                     onSongDetailAsync(id),
-                    onSongPlayAsync(id)
+                    onSongPlayAsync(id),
+                    onSongLyricAsync(id)
                 ]
             ).then((res) => {
                 //歌曲信息和链接都获取成功之后
@@ -80,90 +75,10 @@ export default connect(
                         loaded: true
                     }
                 }));
-            }).then(() => {
-                if (!SongError && !SongPlayError) {
-                    onSongLyricAsync(id).then(() => {
-                        onSetPlayingStatus(true);
-                    })
-                    setTimeout(() => {
-                        this.resize();
-                    });
-                }
-            })
-
-            window.addEventListener('resize', this.resize, false);
-        }
-
-
-
-        addLyricScrollerTimer(audio) {
-            let lines = this.props.SongLyric.data.lines,
-                onSetLyricCurrentIndex = this.props.onSetLyricCurrentIndex;
-            // audio = this.context.parent.playComp.getWrappedInstance().el;
-            this.start = Date.now() - audio.currentTime * 1000
-            this.lyrSclTimer = setInterval(() => {
-                this.now = Date.now();
-                let slaped = this.now - this.start,
-                    current = findIndex(lines, (lyr, index) => {
-                        return index === lines.length - 1 ||
-                            (
-                                slaped >= lyr.time * 1000 &&
-                                slaped <= lines[index + 1].time * 1000
-                            )
-                    });
-                current !== this.last && (
-                    this.last = current,
-                    this.setState(prevState => {
-                        return {
-                            lyricIndex: current
-                        }
-                    }),
-                    this.SongLyricComp.addHighlightToCurrentLine()
-                );
-            }, 16);
-        }
-        removeLyricScrollerTimer() {
-            this.lyrSclTimer && clearInterval(this.lyrSclTimer);
-            this.lyrSclTimer = null;
-        }
-
-        resize = () => {
-            let { onSetLyricOtherData, SongLyric } = this.props,
-                lritems = document.querySelectorAll('.j-lritem');
-            if (!lritems || lritems.length === 0) {
-                return this.removeResize();
-            }
-            let _other = lyricConverter.getOtherData({
-                lyric: SongLyric.data,
-                lritems
             });
-            onSetLyricOtherData(_other);
         }
-        removeResize = () => {
-            window.removeEventListener('resize', this.resize);
-        }
-        onChangePlayStatus = (status) => {
-            this.playComp.el[status]();
-        }
-        onResetLyricTimer = (status) => {
-            status
-                ? this.addLyricScrollerTimer(this.playComp.el)
-                : this.removeLyricScrollerTimer()
-        }
-        onSetTransformStyle = () => {
-            this.infoComp.setTransformStyle();
-        }
-
-        onEnd() {
-            this.setState(prevState => {
-                return {
-                    lyricIndex: 0
-                }
-            })
-        }
-
         render() {
-            let { Song, SongLyric } = this.props,
+            let { Song, SongLyric, SongPlay, onSetPlayingStatus } = this.props,
                 SongData = Song.data,
                 bgStyle;
             let { lyricIndex } = this.state;
@@ -185,19 +100,15 @@ export default connect(
                                         <div className="m-song_newfst">
                                             {/* <span className="m-logo"></span> */}
                                             <SongInfoComp
-                                                ref={infoComp => this.infoComp = infoComp && infoComp.getWrappedInstance()}
-                                                onChangePlayStatus={this.onChangePlayStatus}
+                                                ref={infoComp => this.infoComp = infoComp}
+                                                onSetIndex={this.onSetLyricIndex}
+                                                Song={Song}
+                                                SongLyric={SongLyric}
+                                                SongPlay={SongPlay}
+                                                onSetPlayingStatus={onSetPlayingStatus}
                                             />
-                                            <SongLyricComp ref={comp => this.SongLyricComp = comp} index={lyricIndex} Song={Song} SongLyric={SongLyric} />
-                                            <SongPlayComp
-                                                ref={playComp => this.playComp = playComp && playComp.getWrappedInstance()}
-                                                onResetLyricTimer={this.onResetLyricTimer}
-                                                onSetTransformStyle={
-                                                    this.onSetTransformStyle
-                                                }
-                                                onEnd={
-                                                    this.onEnd.bind(this)
-                                                }
+                                            <SongLyricComp
+                                                index={lyricIndex}
                                             />
                                             <div>
                                                 <div className="m-giude" style={{ bottom: '-14px' }}>

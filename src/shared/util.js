@@ -7,3 +7,12 @@ export function pad(val, str, len) {
 }
 
 
+export function getTransform() {
+    return function (e) {
+        var t = ["transform", "webkitTransform", "msTransform", "MozTransform"];
+        for (var n in t)
+            if (void 0 !== e.style[t[n]])
+                return t[n];
+        return t[1];
+    }(document.createElement("div"))
+}

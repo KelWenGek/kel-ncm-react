@@ -12,7 +12,6 @@ const definition = completeModule(
         mapDefinitionToModule({ types, reducerHandlers, actionCreators }) {
             return {
                 initialState: {
-                    lyricIndex: 0,
                 },
                 actionCreators: {
                     ...actionCreators,
@@ -97,7 +96,7 @@ const definition = completeModule(
                             }
                         }).then(({ data }) => {
                             if (data.code === 200) {
-                                let result = Object.assign({}, data.data[0] || {}, { playing: false });
+                                let result = Object.assign({}, data.data[0] || {}, { playing: true });
                                 dispatch(
                                     actionCreators.onSongPlaySuccess(
                                         {
@@ -121,13 +120,8 @@ const definition = completeModule(
                         return state;
                     },
                     [types.SET_OTHER_DATA](state, action) {
-                        return mergeDeep(state, {
-                            songLyric: {
-                                data: {
-                                    _other: action.payload
-                                }
-                            }
-                        });
+                        state.songLyric.data._other = action.payload;
+                        return state;
                     },
                     [types.SET_PLAYING_STATUS](state, action) {
                         return mergeDeep(state, {
