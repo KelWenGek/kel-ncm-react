@@ -4,7 +4,7 @@ import cn from 'classnames';
 import { definition as playlistDefinition } from '@/store/playlist';
 import PlaylistComment from './PlaylistComment';
 export default connect(
-    ({ app: { playlist: { playlist, playlistLoading } } }) => ({ Playlist: playlist, PlaylistLoading: playlistLoading }),
+    ({ playlist: { playlist, playlistLoading } }) => ({ Playlist: playlist, PlaylistLoading: playlistLoading }),
     {
         onPlaylistAsync: playlistDefinition.result.actionCreators.onPlaylistAsync,
         onPlaylistCommentAsync: playlistDefinition.result.actionCreators.onPlaylistCommentAsync

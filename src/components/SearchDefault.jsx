@@ -4,7 +4,7 @@ import SearchHotComp from '@/components/SearchHot'
 import { definition as searchDefinition } from '@/store/search';
 // import SearchHistoryComp from '@/components/SearchHistory'
 export default connect(
-    ({ app: { search: { searchHot } } }) => ({ SearchHot: searchHot }),
+    ({ search: { searchHot } }) => ({ SearchHot: searchHot }),
     { onSearchHotAsync: searchDefinition.result.actionCreators.onSearchHotAsync }
 )(
     class SearchDefaultComp extends Component {

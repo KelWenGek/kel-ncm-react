@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { definition as searchDefinition } from '@/store/search';
 
 export default connect(
-    ({ app: { search: { searchResult, searchResultLoading, searchKeyword } } }) => ({ SearchResult: searchResult, SearchResultLoading: searchResultLoading, SearchKeyword: searchKeyword })
+    ({ search: { searchResult, searchResultLoading, searchKeyword } }) => ({ SearchResult: searchResult, SearchResultLoading: searchResultLoading, SearchKeyword: searchKeyword })
 )(class SearchResultComp extends Component {
     render() {
         let { SearchResult, SearchKeyword, SearchResultLoading } = this.props,

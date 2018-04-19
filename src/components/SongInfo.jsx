@@ -3,10 +3,10 @@ import PropTypes from 'prop-types'
 import cn from 'classnames'
 import SongPlayComp from './SongPlay'
 import lyricConverter from '@/shared/lyric'
+import { getTransform } from '@/shared/util'
+
 export default class SongInfo extends Component {
-    static contextTypes = {
-        transform: PropTypes.string
-    }
+
     static getDerivedStateFromProps(nextProps, prevState) {
         let playing = nextProps.SongPlay.data.playing;
         return {
@@ -23,7 +23,7 @@ export default class SongInfo extends Component {
     setTransformStyle() {
         let songImg = this.roll,
             songWrap = this.turn,
-            transformKey = this.context.transform,
+            transformKey = getTransform(),
             songImgTransform = getComputedStyle(songImg, null)[transformKey],
             songWrapTransform = getComputedStyle(songWrap, null)[transformKey];
         let transform = songWrapTransform === 'none'
@@ -50,11 +50,12 @@ export default class SongInfo extends Component {
     //音乐播放中
     onTimeupdate = () => {
         //找到当前歌词序号
-        let slapedTime = this.audio.el.currentTime,
-            lines = this.props.SongLyric.data.lines;
-        console.log(slapedTime);
+        let { SongLyric } = this.props,
+            slapedTime = this.audio.el.currentTime,
+            lines;
+        if (!SongLyric.data) return;
+        lines = SongLyric.data.lines;
         let curIndex = lyricConverter.findLyricByTime(slapedTime, lines, this.curIndex);
-        console.log(curIndex);
         "number" == typeof curIndex && (this.props.onSetIndex(curIndex), this.curIndex = curIndex);
     }
     //音乐切换到暂停状态

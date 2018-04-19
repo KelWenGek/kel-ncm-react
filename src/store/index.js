@@ -8,11 +8,9 @@ import { reducer as searchReducer } from './search';
 import { reducer as playlistReducer } from './playlist';
 import { reducer as songReducer } from './song';
 export default createStore(combineReducers({
-    app: combineReducers({
-        home: homeReducer,
-        search: searchReducer,
-        playlist: playlistReducer,
-        song: songReducer
-    }),
+    home: homeReducer,
+    search: searchReducer,
+    playlist: playlistReducer,
+    song: songReducer,
     router: routerReducer
 }), composeWithDevTools(applyMiddleware(routerMiddleware(history), thunk)));

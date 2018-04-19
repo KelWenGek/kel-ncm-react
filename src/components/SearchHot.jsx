@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { definition as searchDefinition } from '@/store/search';
 export default connect(
-    ({ app: { search: { searchHot, searchResult, searchKeyword } } }) => ({ SearchHot: searchHot, SearchResult: searchResult, SearchKeyword: searchKeyword }),
+    ({ search: { searchHot, searchResult, searchKeyword } }) => ({ SearchHot: searchHot, SearchResult: searchResult, SearchKeyword: searchKeyword }),
     { onSearchResultAsync: searchDefinition.result.actionCreators.onSearchResultAsync }
 )(
     class SearchHotComp extends Component {

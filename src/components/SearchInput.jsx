@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 import { definition as searchDefinition } from '@/store/search';
 import cn from 'classnames'
 export default connect(
-    ({ app: { search: { searchKeyword } } }) => ({ SearchKeyword: searchKeyword }),
+    ({ search: { searchKeyword } }) => ({ SearchKeyword: searchKeyword }),
     {
         onKeywordSet: searchDefinition.result.actionCreators.onKeywordSet,
         onKeywordClear: searchDefinition.result.actionCreators.onKeywordClear,

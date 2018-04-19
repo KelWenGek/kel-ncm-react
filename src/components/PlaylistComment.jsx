@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PlaylistCommentItem from './PlaylistCommentItem'
 export default connect(
-    ({ app: { playlist: { playlistComment, playlistCommentLoading } } }) => ({ PlaylistComment: playlistComment, PlaylistCommentLoading: playlistCommentLoading })
+    ({ playlist: { playlistComment, playlistCommentLoading } }) => ({ PlaylistComment: playlistComment, PlaylistCommentLoading: playlistCommentLoading })
 )(
     class PlaylistComment extends Component {
         render() {

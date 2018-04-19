@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import debounce from 'lodash/debounce';
 import { definition as searchDefinition } from '@/store/search';
 export default connect(
-    ({ app: { search: { searchKeyword, searchSuggest, searchResult, searchSuggestLoading } } }) => ({ SearchKeyword: searchKeyword, SearchSuggest: searchSuggest, SearchResult: searchResult, SearchSuggestLoading: searchSuggestLoading }),
+    ({ search: { searchKeyword, searchSuggest, searchResult, searchSuggestLoading } }) => ({ SearchKeyword: searchKeyword, SearchSuggest: searchSuggest, SearchResult: searchResult, SearchSuggestLoading: searchSuggestLoading }),
     {
         onSearchResultAsync: searchDefinition.result.actionCreators.onSearchResultAsync
     }

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { definition as homeDefinition } from '@/store/home';
 import cn from 'classnames'
 export default connect(
-    ({ app: { home: { curTabIndex } } }) => ({ HomeTabCurIdx: curTabIndex }),
+    ({ home: { curTabIndex } }) => ({ HomeTabCurIdx: curTabIndex }),
     { onTabChange: homeDefinition.result.actionCreators.onTabChange }
 )(
     class HomeNav extends Component {

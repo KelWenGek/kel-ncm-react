@@ -10,13 +10,14 @@ import lyricConverter from '@/shared/lyric'
 import { getTransform } from '@/shared/util'
 
 export default connect(
-    ({ app: { song: { song, songLyric } } }) => ({ Song: song, SongLyric: songLyric }),
-    { onSetLyricOtherData: songDefinition.result.actionCreators.onSetLyricOtherData }
+    ({ song: { song, songLyric } }) => ({ Song: song, SongLyric: songLyric }),
+    {
+        onSetLyricOtherData: songDefinition.result.actionCreators.onSetLyricOtherData,
+        onSongLyricAsync: songDefinition.result.actionCreators.onSongLyricAsync,
+    }
 )(
     class SongLyric extends Component {
-        static contextTypes = {
-            transform: PropTypes.string
-        }
+
         static getDerivedStateFromProps(nextProps, nextState) {
             let { SongLyric, index } = nextProps,
                 SongLyricData = SongLyric.data;
@@ -55,11 +56,13 @@ export default connect(
         state = {}
 
         componentDidMount() {
-            this.addHighlightToCurrentLine();
-            this.resize();
+            let { Song, onSongLyricAsync } = this.props;
+            // this.addHighlightToCurrentLine();
+            onSongLyricAsync(Song.data.id);
             window.addEventListener('resize', debounce(this.resize, 700).bind(this), false);
         }
-        componentDidUpdate(){
+        componentDidUpdate(prevProps, prevState) {
+            prevProps.SongLyric.loaded || this.resize();
             this.addHighlightToCurrentLine();
         }
         addHighlightToCurrentLine() {
@@ -112,7 +115,7 @@ export default connect(
                                         style={scrollerTransform}
                                     >
                                         {
-                                            SongLyricData.lines.map((line,i) => (
+                                            SongLyricData.lines.map((line, i) => (
                                                 <p
                                                     key={`lyricm_${i}`}
                                                     className="m-song-lritem j-lritem" >

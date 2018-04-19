@@ -6,7 +6,7 @@ import HomeRecoNewsgComp from '@/components/HomeRecoNewsg'
 import HomeRecoPlaylistComp from '@/components/HomeRecoPlaylist'
 import { definition as homeDefinition } from '@/store/home';
 export default connect(
-    ({ app: { home: { recoNewsg, recoPlaylist } } }) => ({ HomeRecoNewsg: recoNewsg, HomeRecoPlaylist: recoPlaylist }),
+    ({ home: { recoNewsg, recoPlaylist } }) => ({ HomeRecoNewsg: recoNewsg, HomeRecoPlaylist: recoPlaylist }),
     {
         onNewsgAsync: homeDefinition.result.actionCreators.onRecoNewsgAsync,
         onPlaylistAsync: homeDefinition.result.actionCreators.onRecoPlaylistAsync

@@ -6,7 +6,7 @@ import { GET_HOME_TOP } from '@/constants/API';
 import Empty from '@/components/Empty'
 import { definition as homeDefinition } from '@/store/home';
 export default connect(
-    ({ app: { home: { hotListLoading, hotList } } }) => ({ HomeHotListLoading: hotListLoading, HomeHotList: hotList }),
+    ({ home: { hotListLoading, hotList } }) => ({ HomeHotListLoading: hotListLoading, HomeHotList: hotList }),
     { onHotListAsync: homeDefinition.result.actionCreators.onHotListAsync }
 )(class HomeHotList extends Component {
 

@@ -10,13 +10,11 @@ import SongInfoComp from './SongInfo'
 import SongLyricComp from './SongLyric'
 export default connect(
     ({
-        app: {
-            song:
-            {
-                song,
-                songLyric,
-                songPlay,
-            }
+        song:
+        {
+            song,
+            songLyric,
+            songPlay,
         }
     }) => ({
         Song: song,
@@ -32,23 +30,11 @@ export default connect(
     }
 )(
     class SongDetail extends Component {
-        static childContextTypes = {
-            transform: PropTypes.string
-        }
+
         state = {
             lyricIndex: 0
         }
-        getChildContext() {
-            return {
-                transform: function (e) {
-                    var t = ["transform", "webkitTransform", "msTransform", "MozTransform"];
-                    for (var n in t)
-                        if (void 0 !== e.style[t[n]])
-                            return t[n];
-                    return t[1];
-                }(document.createElement("div"))
-            }
-        }
+
         onSetLyricIndex = (curIndex) => {
             this.setState({
                 lyricIndex: curIndex
@@ -65,8 +51,8 @@ export default connect(
             Promise.all(
                 [
                     onSongDetailAsync(id),
-                    onSongPlayAsync(id),
-                    onSongLyricAsync(id)
+                    onSongPlayAsync(id)
+                    // onSongLyricAsync(id)
                 ]
             ).then((res) => {
                 //歌曲信息和链接都获取成功之后
