@@ -5,11 +5,11 @@ import { pad } from '@/shared/util';
 import { GET_HOME_TOP } from '@/constants/API';
 import Empty from '@/components/Empty'
 import { definition as homeDefinition } from '@/store/home';
-export default connect(
+@connect(
     ({ home: { hotListLoading, hotList } }) => ({ HomeHotListLoading: hotListLoading, HomeHotList: hotList }),
     { onHotListAsync: homeDefinition.result.actionCreators.onHotListAsync }
-)(class HomeHotList extends Component {
-
+)
+export default class HomeHotList extends Component {
     componentDidMount() {
         let { onHotListAsync, HomeHotList } = this.props;
         HomeHotList.loaded || onHotListAsync();
@@ -63,4 +63,4 @@ export default connect(
             </div>
         )
     }
-})
+}

@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { definition as searchDefinition } from '@/store/search';
-
-export default connect(
+@connect(
     ({ search: { searchResult, searchResultLoading, searchKeyword } }) => ({ SearchResult: searchResult, SearchResultLoading: searchResultLoading, SearchKeyword: searchKeyword })
-)(class SearchResultComp extends Component {
+)
+export default class SearchResultComp extends Component {
     render() {
         let { SearchResult, SearchKeyword, SearchResultLoading } = this.props,
             hasResult = SearchResult.data && SearchResult.data.length > 0;
@@ -50,4 +50,4 @@ export default connect(
             </div>
         )
     }
-})
+}

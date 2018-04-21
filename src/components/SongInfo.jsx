@@ -68,7 +68,7 @@ export default class SongInfo extends Component {
     onEnded = () => {
         this.setTransformStyle();
         this.props.onSetPlayingStatus(false);
-        this.props.onSetIndex(0);
+        this.props.onSetIndex(this.curIndex = 0);
     }
     //音乐播放出错
     onError = () => {
